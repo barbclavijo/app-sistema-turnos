@@ -15,19 +15,19 @@ class PatientController:
 
         if request.method == "POST":
 
-            nombre = request.form.get("nombre").strip()
-            apellido = request.form.get("apellido").strip()
+            first_name = request.form.get("first_name").strip()
+            last_name = request.form.get("last_name").strip()
             dni = request.form.get("dni").strip()
-            fecha_nac = request.form.get("fecha_nac").strip()
+            birth_date = request.form.get("birth_date").strip()
             email = request.form.get("email").strip()
-            telefono = request.form.get("telefono").strip()
+            phone = request.form.get("phone").strip()
 
             if (
-                not nombre or
-                not apellido or
+                not first_name or
+                not last_name or
                 not dni or
                 not email or
-                not telefono
+                not phone
             ):
 
                 message = (
@@ -42,7 +42,7 @@ class PatientController:
                 )
 
             else:
-                patient = Patient(nombre, apellido, dni, fecha_nac, email, telefono)
+                patient = Patient(first_name, last_name, dni, birth_date, email, phone)
                 saved = patient.save()
 
                 if saved:
