@@ -36,3 +36,8 @@ CREATE TABLE IF NOT EXISTS appointments (
     status           TEXT NOT NULL DEFAULT 'available',
     created_at       TEXT NOT NULL DEFAULT (datetime('now'))
 );
+
+CREATE TABLE IF NOT EXISTS app_config (
+    key    TEXT PRIMARY KEY,
+    value  TEXT NOT NULL
+);
