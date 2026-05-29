@@ -6,7 +6,7 @@ from models.database import Database
 class Appointment:
 
     @staticmethod
-    def available():
+    def find_all_available():
         connection = None
         try:
             connection = Database.connect()
@@ -31,7 +31,7 @@ class Appointment:
                 connection.close()
 
     @staticmethod
-    def for_patient(patient_user_id):
+    def find_all_by_patient(patient_user_id):
         connection = None
         try:
             connection = Database.connect()

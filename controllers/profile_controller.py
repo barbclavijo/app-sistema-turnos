@@ -3,8 +3,7 @@ from flask import (
     request
 )
 
-from models.user import User
-from models.profile import Profile
+from services.auth_service import AuthService
 
 
 class ProfileController:
@@ -33,18 +32,11 @@ class ProfileController:
                 not password
             ):
                 message = "Todos los campos obligatorios deben completarse."
-            elif User.find_by_email(email):
-                message = "El email ya se encuentra registrado."
-            elif Profile.find_by_dni(dni):
-                message = "El DNI ya se encuentra registrado."
             else:
-                user = User(email, password)
-
-                if user.save() and Profile(
-                    user.id, first_name, last_name, dni, birth_date, phone
-                ).save():
-                    message = "Paciente registrado correctamente."
-                else:
-                    message = "Ocurrió un error al registrar el paciente."
+                ok, error = AuthService.register(
+                    first_name, last_name, email, password,
+                    dni=dni, birth_date=birth_date, phone=phone
+                )
+                message = "Paciente registrado correctamente." if ok else error
 
         return render_template("profile/create_patient.html", message=message)

@@ -17,7 +17,7 @@ class Profile:
         self.phone = phone
 
     @staticmethod
-    def find_by_dni(dni):
+    def find_one_by_dni(dni):
         connection = None
         try:
             connection = Database.connect()

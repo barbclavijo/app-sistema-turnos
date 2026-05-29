@@ -16,7 +16,7 @@ app.secret_key = config.SECRET_KEY
 def inject_current_user():
     user = None
     if "user_id" in session:
-        user = User.with_profile(session["user_id"])
+        user = User.find_one_with_profile(session["user_id"])
     return {"current_user": user}
 
 @app.route("/")

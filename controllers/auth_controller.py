@@ -8,7 +8,7 @@ from flask import (
 )
 
 from models.user import User
-from models.profile import Profile
+from services.auth_service import AuthService
 
 
 def login_required(view):
@@ -26,7 +26,7 @@ def role_required(role):
         def wrapper(*args, **kwargs):
             if "user_id" not in session:
                 return redirect("/signin")
-            user = User.with_profile(session["user_id"])
+            user = User.find_one_with_profile(session["user_id"])
             if not user or user["role"] != role:
                 return redirect("/turnos")
             return view(*args, **kwargs)
@@ -49,7 +49,7 @@ class AuthController:
             if not email or not password:
                 message = "Complete email y contraseña."
             else:
-                user = User.verify(email, password)
+                user = AuthService.authenticate(email, password)
 
                 if user:
                     session["user_id"] = user["id"]
@@ -83,15 +83,9 @@ class AuthController:
                 message = "Todos los campos obligatorios deben completarse."
             elif password != confirm_password:
                 message = "Las contraseñas no coinciden."
-            elif User.find_by_email(email):
-                message = "El email ya se encuentra registrado."
             else:
-                user = User(email, password)
-
-                if user.save() and Profile(user.id, first_name, last_name).save():
-                    message = "Cuenta creada correctamente."
-                else:
-                    message = "Ocurrió un error al crear la cuenta."
+                ok, error = AuthService.register(first_name, last_name, email, password)
+                message = "Cuenta creada correctamente." if ok else error
 
         return render_template("auth/signup.html", message=message)
 

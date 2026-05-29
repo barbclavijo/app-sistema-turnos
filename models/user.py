@@ -15,7 +15,7 @@ class User:
         self.role = role
 
     @staticmethod
-    def find_by_email(email):
+    def find_one_by_email(email):
         connection = None
         try:
             connection = Database.connect()
@@ -31,14 +31,7 @@ class User:
                 connection.close()
 
     @staticmethod
-    def verify(email, password):
-        user = User.find_by_email(email)
-        if user and check_password_hash(user["password"], password):
-            return user
-        return None
-
-    @staticmethod
-    def with_profile(user_id):
+    def find_one_with_profile(user_id):
         connection = None
         try:
             connection = Database.connect()
@@ -60,6 +53,13 @@ class User:
         finally:
             if connection:
                 connection.close()
+
+    @staticmethod
+    def verify(email, password):
+        user = User.find_one_by_email(email)
+        if user and check_password_hash(user["password"], password):
+            return user
+        return None
 
     def save(self):
         connection = None
