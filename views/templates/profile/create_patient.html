@@ -1,5 +1,4 @@
-{% extends "dashboard.html" %} {% block title %}Alta de Paciente - MedClinic
-Pro{% endblock %} {% block content %}
+{% extends "layouts/dashboard.html" %} {% block title %}Alta de Paciente - ClinicalSys{% endblock %} {% block content %}
 <div class="max-w-4xl mx-auto px-gutter py-xl">
   <!-- Header -->
   <div class="mb-lg">
@@ -179,6 +178,37 @@ Pro{% endblock %} {% block content %}
           <span
             class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-outline-variant group-focus-within:text-primary transition-colors"
             >call</span
+          >
+        </div>
+      </div>
+      <!-- Acceso -->
+      <div class="col-span-full mt-4 mb-2">
+        <div class="flex items-center gap-2">
+          <span class="w-8 h-1 bg-primary rounded-full"></span>
+          <h3
+            class="font-title-md text-title-md font-bold text-primary uppercase tracking-wider">
+            Acceso
+          </h3>
+        </div>
+      </div>
+      <!-- Contraseña provisoria -->
+      <div class="space-y-2">
+        <label
+          class="font-label-lg text-label-lg text-on-surface-variant px-1"
+          for="password"
+          >Contraseña provisoria</label
+        >
+        <div class="relative group">
+          <input
+            class="w-full bg-surface-container-low border-none rounded-2xl px-5 py-4 focus:ring-2 focus:ring-primary transition-all text-body-lg"
+            id="password"
+            name="password"
+            placeholder="El paciente podrá cambiarla luego"
+            required
+            type="text" />
+          <span
+            class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-outline-variant group-focus-within:text-primary transition-colors"
+            >key</span
           >
         </div>
       </div>

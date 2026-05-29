@@ -1,8 +1,9 @@
 import os
+import glob
 import sqlite3
 import config
 
-SCHEMA_PATH = os.path.join(config.BASE_DIR, "database", "schema.sql")
+SQL_DIR = os.path.join(config.BASE_DIR, "database")
 
 
 class Database:
@@ -20,12 +21,13 @@ class Database:
 
             connection = Database.connect()
 
-            with open(SCHEMA_PATH, encoding="utf-8") as schema:
-                connection.executescript(schema.read())
+            for path in sorted(glob.glob(os.path.join(SQL_DIR, "*.sql"))):
+                with open(path, encoding="utf-8") as sql_file:
+                    connection.executescript(sql_file.read())
 
             connection.commit()
 
-            print("Esquema aplicado correctamente.")
+            print("Esquema y datos aplicados correctamente.")
 
         except (sqlite3.Error, OSError) as error:
 

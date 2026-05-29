@@ -1,0 +1,87 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Crear Cuenta - ClinicalSys{% endblock %}
+
+{% block body %}
+<main class="min-h-screen flex items-center justify-center p-md md:p-lg">
+    <div class="w-full max-w-[1100px] grid grid-cols-1 md:grid-cols-2 bg-surface-container-lowest rounded-3xl overflow-hidden shadow-2xl border border-outline-variant/10">
+        <!-- Branding -->
+        <div class="hidden md:flex flex-col justify-between p-2xl relative bg-primary overflow-hidden">
+            <div class="absolute inset-0 opacity-20">
+                <div class="absolute top-0 -left-10 w-64 h-64 bg-white rounded-full blur-3xl"></div>
+                <div class="absolute bottom-0 -right-10 w-96 h-96 bg-surface-container-highest rounded-full blur-3xl"></div>
+            </div>
+            <div class="relative z-10">
+                <div class="flex items-center gap-sm mb-xl">
+                    <span class="material-symbols-outlined text-on-primary text-4xl">medical_services</span>
+                    <h1 class="font-headline-lg text-headline-lg font-black tracking-tighter text-on-primary">ClinicalSys</h1>
+                </div>
+                <h2 class="font-display-lg text-display-lg text-on-primary leading-tight mt-lg">Su salud,<br /><span class="opacity-60">nuestra tecnología.</span></h2>
+            </div>
+            <div class="relative z-10">
+                <p class="font-body-lg text-body-lg text-on-primary/80 max-w-sm">Únase a la plataforma de gestión médica. Acceso a su historial, citas y resultados.</p>
+            </div>
+        </div>
+
+        <!-- Form -->
+        <div class="p-lg md:p-2xl flex flex-col justify-center bg-surface">
+            <div class="max-w-md mx-auto w-full">
+                <div class="md:hidden flex items-center gap-sm mb-lg">
+                    <span class="material-symbols-outlined text-primary text-3xl">medical_services</span>
+                    <h1 class="font-headline-lg-mobile text-headline-lg-mobile font-black tracking-tighter text-primary">ClinicalSys</h1>
+                </div>
+                <div class="mb-xl">
+                    <h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg font-bold text-on-surface">Crear Cuenta</h2>
+                    <p class="font-body-md text-body-md text-on-surface-variant mt-xs">Complete los datos para registrarse.</p>
+                </div>
+                {% if message %}
+                <div class="mb-md flex items-center gap-2 rounded-lg px-4 py-3 {% if 'correctamente' in message %}bg-primary text-white{% else %}bg-error-container text-on-error-container{% endif %}">
+                    <span class="material-symbols-outlined">{% if 'correctamente' in message %}check_circle{% else %}error{% endif %}</span>
+                    <span class="font-label-lg text-label-lg">{{ message }}</span>
+                </div>
+                {% endif %}
+                <form method="POST" class="space-y-md">
+                    <div class="grid grid-cols-2 gap-md">
+                        <div>
+                            <label class="font-label-lg text-label-lg text-on-surface-variant ml-1" for="first_name">Nombre</label>
+                            <input class="mt-xs w-full h-12 px-4 bg-surface-container-low border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary outline-none transition-all" id="first_name" name="first_name" placeholder="Ej: Juan" required type="text" />
+                        </div>
+                        <div>
+                            <label class="font-label-lg text-label-lg text-on-surface-variant ml-1" for="last_name">Apellido</label>
+                            <input class="mt-xs w-full h-12 px-4 bg-surface-container-low border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary outline-none transition-all" id="last_name" name="last_name" placeholder="Ej: Pérez" required type="text" />
+                        </div>
+                    </div>
+                    <div>
+                        <label class="font-label-lg text-label-lg text-on-surface-variant ml-1" for="email">Email</label>
+                        <input class="mt-xs w-full h-12 px-4 bg-surface-container-low border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary outline-none transition-all" id="email" name="email" placeholder="juan.perez@ejemplo.com" required type="email" />
+                    </div>
+                    <div>
+                        <label class="font-label-lg text-label-lg text-on-surface-variant ml-1" for="password">Contraseña</label>
+                        <input class="mt-xs w-full h-12 px-4 bg-surface-container-low border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary outline-none transition-all" id="password" name="password" placeholder="••••••••" required type="password" />
+                    </div>
+                    <div>
+                        <label class="font-label-lg text-label-lg text-on-surface-variant ml-1" for="confirm_password">Confirmar Contraseña</label>
+                        <input class="mt-xs w-full h-12 px-4 bg-surface-container-low border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary outline-none transition-all" id="confirm_password" name="confirm_password" placeholder="••••••••" required type="password" />
+                    </div>
+                    <div class="flex items-start gap-sm pt-xs">
+                        <input class="mt-1 rounded border-outline-variant text-primary focus:ring-primary h-4 w-4" id="terms" name="terms" type="checkbox" required />
+                        <label class="font-body-md text-body-md text-on-surface-variant" for="terms">Acepto los
+                            <a class="text-primary font-bold hover:underline" href="#">Términos y Condiciones</a> y la
+                            <a class="text-primary font-bold hover:underline" href="#">Política de Privacidad</a>.
+                        </label>
+                    </div>
+                    <button class="w-full h-12 bg-primary text-on-primary rounded-full font-title-md hover:opacity-90 active:scale-[0.98] transition-all flex items-center justify-center gap-sm" type="submit">
+                        Crear Cuenta
+                        <span class="material-symbols-outlined">arrow_forward</span>
+                    </button>
+                </form>
+                <div class="mt-xl text-center">
+                    <p class="font-body-md text-body-md text-on-surface-variant">¿Ya tienes cuenta?
+                        <a class="text-primary font-bold hover:underline" href="/signin">Iniciar sesión</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %}

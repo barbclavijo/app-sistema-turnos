@@ -1,0 +1,94 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Iniciar Sesión - ClinicalSys{% endblock %}
+
+{% block head %}
+<style>
+    .hero-pattern {
+        background-color: #000000;
+        background-image: radial-gradient(circle at 2px 2px, rgba(255, 255, 255, 0.05) 1px, transparent 0);
+        background-size: 24px 24px;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<main class="min-h-screen flex flex-col md:flex-row overflow-hidden">
+    <!-- Branding -->
+    <section class="relative hidden md:flex md:w-1/2 hero-pattern items-center justify-center p-2xl overflow-hidden">
+        <div class="relative z-10 w-full max-w-lg space-y-lg">
+            <div class="flex items-center gap-sm mb-xl">
+                <div class="bg-white p-2 rounded-lg flex items-center justify-center">
+                    <span class="material-symbols-outlined text-primary text-[32px]">medical_services</span>
+                </div>
+                <h1 class="font-title-lg text-title-lg font-bold text-white tracking-tight">ClinicalSys</h1>
+            </div>
+            <h2 class="font-headline-lg text-headline-lg text-white font-bold leading-tight">Su salud,<br />nuestra prioridad.</h2>
+            <p class="font-body-lg text-body-lg text-white/70 max-w-md">Acceda a la plataforma de gestión médica. Gestione sus citas, historial y pacientes con la máxima seguridad.</p>
+            <div class="pt-2xl flex flex-wrap gap-lg">
+                <div class="flex items-center gap-xs text-white/80">
+                    <span class="material-symbols-outlined text-[20px]">shield</span>
+                    <span class="font-label-lg text-label-lg">Seguridad HIPAA</span>
+                </div>
+                <div class="flex items-center gap-xs text-white/80">
+                    <span class="material-symbols-outlined text-[20px]">bolt</span>
+                    <span class="font-label-lg text-label-lg">Acceso Instantáneo</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Form -->
+    <section class="flex-1 flex flex-col items-center justify-center bg-white px-margin-mobile md:px-margin-desktop py-2xl min-h-screen">
+        <div class="md:hidden flex items-center gap-sm mb-2xl">
+            <span class="material-symbols-outlined text-primary text-[28px]">medical_services</span>
+            <span class="font-title-md text-title-md font-bold text-primary">ClinicalSys</span>
+        </div>
+        <div class="w-full max-w-[420px] space-y-xl">
+            <header class="space-y-xs">
+                <h2 class="font-headline-lg text-headline-lg text-on-surface font-extrabold tracking-tight">Iniciar Sesión</h2>
+                <p class="font-body-md text-body-md text-on-surface-variant">Bienvenido de nuevo. Ingrese sus credenciales para acceder.</p>
+            </header>
+            {% if message %}
+            <div class="flex items-center gap-2 rounded-lg px-4 py-3 bg-error-container text-on-error-container">
+                <span class="material-symbols-outlined">error</span>
+                <span class="font-label-lg text-label-lg">{{ message }}</span>
+            </div>
+            {% endif %}
+            <form method="POST" class="space-y-lg">
+                <!-- Email -->
+                <div class="space-y-xs">
+                    <label class="font-label-lg text-label-lg text-on-surface-variant ml-1" for="email">Email</label>
+                    <div class="relative flex items-center">
+                        <span class="material-symbols-outlined absolute left-4 text-on-surface-variant/70">mail</span>
+                        <input class="w-full h-12 pl-12 pr-4 bg-surface-container-low border border-outline-variant rounded-lg font-body-md focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" id="email" name="email" placeholder="ejemplo@clinicalsys.com" required type="email" />
+                    </div>
+                </div>
+                <!-- Password -->
+                <div class="space-y-xs">
+                    <div class="flex justify-between items-center px-1">
+                        <label class="font-label-lg text-label-lg text-on-surface-variant" for="password">Contraseña</label>
+                        <a class="font-label-lg text-label-lg text-primary hover:underline font-bold" href="#">Olvidé mi contraseña</a>
+                    </div>
+                    <div class="relative flex items-center">
+                        <span class="material-symbols-outlined absolute left-4 text-on-surface-variant/70">lock</span>
+                        <input class="w-full h-12 pl-12 pr-12 bg-surface-container-low border border-outline-variant rounded-lg font-body-md focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" id="password" name="password" placeholder="••••••••" required type="password" />
+                        <button class="absolute right-4 text-on-surface-variant/70 hover:text-primary transition-colors" onclick="const p=document.getElementById('password'); p.type=p.type==='password'?'text':'password';" type="button">
+                            <span class="material-symbols-outlined">visibility</span>
+                        </button>
+                    </div>
+                </div>
+                <button class="w-full h-12 bg-primary text-on-primary rounded-full font-title-md flex items-center justify-center gap-sm group hover:bg-on-surface-variant active:scale-[0.98] transition-all" type="submit">
+                    Entrar
+                    <span class="material-symbols-outlined transition-transform group-hover:translate-x-1">arrow_forward</span>
+                </button>
+            </form>
+            <footer class="text-center pt-md">
+                <p class="font-body-md text-on-surface-variant">¿No tienes cuenta?
+                    <a class="text-primary font-bold hover:underline" href="/signup">Regístrate</a>
+                </p>
+            </footer>
+        </div>
+    </section>
+</main>
+{% endblock %}
