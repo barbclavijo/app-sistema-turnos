@@ -1,0 +1,168 @@
+{% extends "base.html" %} {% block body %}
+<style>
+  #sidebar {
+    width: 18rem;
+  }
+  #sidebar.collapsed .nav-label,
+  #sidebar.collapsed #brand-text {
+    display: none;
+  }
+  #sidebar.collapsed .nav-link,
+  #sidebar.collapsed #brand {
+    justify-content: center;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+
+  /* Mobile: off-canvas overlay*/
+  @media (max-width: 767px) {
+    #sidebar {
+      transform: translateX(-100%);
+    }
+    #sidebar.open {
+      transform: translateX(0);
+    }
+    #content {
+      margin-left: 0;
+    }
+  }
+
+  /* Desktop: collapsible edge button */
+  @media (min-width: 768px) {
+    #sidebar.collapsed {
+      width: 5rem;
+    }
+    #content {
+      margin-left: 18rem;
+    }
+    #content.collapsed {
+      margin-left: 5rem;
+    }
+    #sidebar-toggle {
+      left: 18rem;
+    }
+    #sidebar.collapsed ~ #sidebar-toggle {
+      left: 5rem;
+    }
+    #sidebar.collapsed ~ #sidebar-toggle .toggle-icon {
+      transform: rotate(180deg);
+    }
+  }
+</style>
+
+<!-- Top Navigation Bar -->
+<header
+  class="fixed top-0 left-0 w-full z-40 bg-surface-bright shadow-sm flex items-center px-margin-desktop h-16">
+  <button
+    onclick="toggleMobileSidebar()"
+    aria-label="Abrir menú"
+    class="md:hidden w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container-high transition-colors">
+    <span class="material-symbols-outlined text-primary">menu</span>
+  </button>
+  <div class="flex items-center gap-3 ml-auto">
+    <div class="text-right hidden sm:block leading-tight">
+      <p class="font-label-lg text-label-lg text-primary font-bold">
+        Dra. Ana Gómez
+      </p>
+      <p class="text-[11px] text-on-surface-variant">Administradora</p>
+    </div>
+    <div
+      class="h-10 w-10 rounded-full bg-surface-container-highest flex items-center justify-center border border-outline-variant text-primary">
+      <span class="material-symbols-outlined">account_circle</span>
+    </div>
+    <button
+      title="Cerrar sesión"
+      class="flex items-center gap-2 h-10 px-4 rounded-full border border-outline-variant text-on-surface hover:bg-surface-container-high transition-colors">
+      <span class="material-symbols-outlined">logout</span>
+      <span class="font-label-lg text-label-lg hidden sm:inline"
+        >Cerrar sesión</span
+      >
+    </button>
+  </div>
+</header>
+
+<!-- Side Navigation Bar -->
+<aside
+  id="sidebar"
+  class="fixed left-0 top-0 h-full bg-surface-container-low shadow-md flex flex-col py-lg gap-sm border-r border-outline-variant z-30 pt-20 transition-all duration-300 overflow-hidden">
+  <div id="brand" class="px-4 mb-6 flex items-center gap-3">
+    <div
+      class="w-10 h-10 min-w-[2.5rem] bg-primary rounded-xl flex items-center justify-center text-white">
+      <span class="material-symbols-outlined">medical_services</span>
+    </div>
+    <div id="brand-text">
+      <h2 class="font-label-lg text-label-lg font-black text-primary">
+        MedClinic Pro
+      </h2>
+      <p
+        class="text-[10px] text-on-surface-variant uppercase tracking-widest font-bold">
+        Gestión Médica
+      </p>
+    </div>
+  </div>
+  <nav class="flex-1 space-y-1 px-2">
+    <a
+      class="nav-link text-on-secondary-container flex items-center gap-4 px-4 py-3 hover:bg-surface-container-high rounded-full transition-all"
+      href="#">
+      <span class="material-symbols-outlined">dashboard</span>
+      <span class="nav-label font-label-lg text-label-lg">Panel Principal</span>
+    </a>
+    <a
+      class="nav-link text-on-secondary-container flex items-center gap-4 px-4 py-3 hover:bg-surface-container-high rounded-full transition-all"
+      href="#">
+      <span class="material-symbols-outlined">calendar_today</span>
+      <span class="nav-label font-label-lg text-label-lg">Citas Médicas</span>
+    </a>
+    <a
+      class="nav-link bg-primary text-on-primary flex items-center gap-4 px-4 py-3 rounded-full shadow-md"
+      href="#">
+      <span class="material-symbols-outlined active-icon">groups</span>
+      <span class="nav-label font-label-lg text-label-lg">Pacientes</span>
+    </a>
+    <a
+      class="nav-link text-on-secondary-container flex items-center gap-4 px-4 py-3 hover:bg-surface-container-high rounded-full transition-all"
+      href="#">
+      <span class="material-symbols-outlined">history_edu</span>
+      <span class="nav-label font-label-lg text-label-lg"
+        >Historial Clínico</span
+      >
+    </a>
+  </nav>
+</aside>
+
+<!-- Desktop edge toggle -->
+<button
+  id="sidebar-toggle"
+  onclick="toggleSidebar()"
+  aria-label="Contraer/expandir menú"
+  class="hidden md:flex fixed top-1/2 -translate-x-1/2 -translate-y-1/2 z-40 w-7 h-7 items-center justify-center rounded-full bg-surface-container-lowest border border-outline-variant shadow-md text-primary hover:bg-surface-container-high transition-all">
+  <span
+    class="toggle-icon material-symbols-outlined text-[18px] transition-transform"
+    >chevron_left</span
+  >
+</button>
+
+<!-- Mobile backdrop -->
+<div
+  id="backdrop"
+  onclick="toggleMobileSidebar()"
+  class="md:hidden fixed inset-0 bg-black/40 z-20 hidden"></div>
+
+<!-- Main Content -->
+<main
+  id="content"
+  class="pt-16 h-screen overflow-y-auto bg-background transition-all duration-300">
+  {% block content %}{% endblock %}
+</main>
+
+<script>
+  function toggleSidebar() {
+    document.getElementById("sidebar").classList.toggle("collapsed");
+    document.getElementById("content").classList.toggle("collapsed");
+  }
+  function toggleMobileSidebar() {
+    document.getElementById("sidebar").classList.toggle("open");
+    document.getElementById("backdrop").classList.toggle("hidden");
+  }
+</script>
+{% endblock %}

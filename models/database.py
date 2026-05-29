@@ -1,5 +1,8 @@
+import os
 import sqlite3
 import config
+
+SCHEMA_PATH = os.path.join(config.BASE_DIR, "database", "schema.sql")
 
 
 class Database:
@@ -16,30 +19,18 @@ class Database:
         try:
 
             connection = Database.connect()
-            cursor = connection.cursor()
 
-            cursor.execute("""
-                CREATE TABLE IF NOT EXISTS pacientes (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    nombre TEXT NOT NULL,
-                    apellido TEXT NOT NULL,
-                    dni INTEGER UNIQUE NOT NULL,
-                    fecha_nac TEXT NOT NULL,
-                    email TEXT NOT NULL,
-                    telefono TEXT NOT NULL
-                )
-            """)
+            with open(SCHEMA_PATH, encoding="utf-8") as schema:
+                connection.executescript(schema.read())
 
             connection.commit()
 
-            print(
-                "Base de datos y tabla pacientes creada exitosamente."
-            )
+            print("Esquema aplicado correctamente.")
 
-        except sqlite3.Error as error:
+        except (sqlite3.Error, OSError) as error:
 
             print(
-                f"Error al conectar a la base de datos: {error}"
+                f"Error al aplicar el esquema: {error}"
             )
 
         finally:
