@@ -1,0 +1,192 @@
+{% extends "layouts/dashboard.html" %}
+
+{% block title %}Seleccionar Turno - ClinicalSys{% endblock %}
+
+{% block content %}
+<style>
+  .doctor-card.selected,
+  .doctor-card.selected p { background: #000; color: #fff; }
+  .date-chip.chip-active span { color: #fff; }
+  .date-chip.chip-active { background: #000; }
+  .slot-btn.slot-active { background: #000; color: #fff; border-color: #000; }
+</style>
+
+<div class="max-w-6xl mx-auto px-margin-desktop py-xl space-y-xl">
+  <!-- Header -->
+  <div class="space-y-sm">
+    <h2 class="font-headline-lg text-headline-lg font-bold text-primary">Reserva de Turnos</h2>
+    <p class="font-body-lg text-body-lg text-on-surface-variant">Completá los pasos para agendar una nueva cita médica.</p>
+  </div>
+
+  {% if message %}
+  <div
+    class="flex items-center gap-2 rounded-2xl px-5 py-4 {% if 'correctamente' in message %}bg-primary text-white{% else %}bg-error-container text-on-error-container{% endif %}">
+    <span class="material-symbols-outlined">{% if 'correctamente' in message %}check_circle{% else %}error{% endif %}</span>
+    <span class="font-label-lg text-label-lg">{{ message }}</span>
+  </div>
+  {% endif %}
+
+  {% if doctors %}
+  <form method="POST">
+    <input type="hidden" id="appointment_id" name="appointment_id" />
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter items-start">
+      <!-- Left: Specialty & Doctor -->
+      <div class="lg:col-span-5 space-y-lg">
+        <!-- Step 1: Specialty -->
+        <div class="bg-surface-container-low p-lg rounded-2xl shadow-sm space-y-md">
+          <div class="flex items-center gap-3">
+            <span class="w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold">1</span>
+            <h3 class="font-title-md text-title-md font-bold">Especialidad</h3>
+          </div>
+          <div class="relative">
+            <select id="specialty" onchange="filterSpecialty(this.value)"
+              class="w-full appearance-none bg-surface-container-lowest border-2 border-outline-variant rounded-xl px-4 py-4 font-body-md text-on-surface focus:border-primary focus:ring-0 transition-colors cursor-pointer">
+              {% for s in specialties %}<option value="{{ s }}">{{ s }}</option>{% endfor %}
+            </select>
+            <span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant">expand_more</span>
+          </div>
+        </div>
+        <!-- Step 2: Doctor -->
+        <div class="bg-surface-container-low p-lg rounded-2xl shadow-sm space-y-md">
+          <div class="flex items-center gap-3">
+            <span class="w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold">2</span>
+            <h3 class="font-title-md text-title-md font-bold">Médico</h3>
+          </div>
+          <div class="space-y-3">
+            {% for d in doctors %}
+            <div
+              class="doctor-card bg-surface-container-lowest p-4 rounded-2xl flex items-center gap-4 cursor-pointer hover:bg-surface-container-high transition-all active:scale-[0.98] border-2 border-transparent"
+              data-doctor="{{ d.id }}"
+              data-specialty="{{ d.specialty }}"
+              onclick="selectDoctor('{{ d.id }}')">
+              <div class="w-14 h-14 rounded-full bg-surface-container-high flex items-center justify-center text-primary">
+                <span class="material-symbols-outlined">person</span>
+              </div>
+              <div class="flex-1">
+                <p class="font-label-lg text-label-lg font-bold">Dr/a. {{ d.name }}</p>
+                <p class="text-xs text-on-surface-variant">{{ d.specialty }}</p>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Date & Time -->
+      <div class="lg:col-span-7 space-y-lg">
+        <div class="bg-surface-container-low p-lg rounded-2xl shadow-sm">
+          <div class="flex items-center gap-3 mb-lg">
+            <span class="w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold">3</span>
+            <h3 class="font-title-md text-title-md font-bold">Fecha y Horario</h3>
+          </div>
+
+          <p id="empty-hint" class="font-body-md text-on-surface-variant">Seleccioná un médico para ver los horarios disponibles.</p>
+
+          {% for d in doctors %}
+          <div class="doctor-panel hidden" id="panel-{{ d.id }}">
+            <!-- Date picker -->
+            <div class="flex gap-3 overflow-x-auto pb-4 mb-lg">
+              {% for dt in d.dates %}
+              <button type="button"
+                class="date-chip flex-shrink-0 w-24 h-24 bg-surface-container-lowest rounded-2xl flex flex-col items-center justify-center gap-1 border-2 border-transparent hover:border-outline-variant transition-all"
+                data-date="{{ dt.date }}"
+                onclick="selectDate('{{ d.id }}','{{ dt.date }}')">
+                <span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">{{ dt.date }}</span>
+              </button>
+              {% endfor %}
+            </div>
+            <!-- Slots per date -->
+            {% for dt in d.dates %}
+            <div class="slots hidden grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3" data-date="{{ dt.date }}">
+              {% for s in dt.slots %}
+              <button type="button"
+                class="slot-btn py-4 px-4 rounded-2xl bg-surface-container-lowest border-2 border-outline-variant text-body-md font-bold hover:bg-primary hover:text-on-primary hover:border-primary transition-all active:scale-95"
+                onclick="selectSlot(this,'{{ s.id }}','{{ dt.date }} {{ s.time }} hs • Dr/a. {{ d.name }}')">{{ s.time }}</button>
+              {% endfor %}
+            </div>
+            {% endfor %}
+          </div>
+          {% endfor %}
+        </div>
+
+        <!-- Summary / Confirm -->
+        <div class="flex flex-col sm:flex-row items-center justify-between bg-surface-container-highest p-lg rounded-2xl gap-lg">
+          <div class="text-center sm:text-left">
+            <p class="text-on-surface-variant font-label-sm text-label-sm uppercase tracking-widest font-bold">Resumen de reserva</p>
+            <p id="summary" class="font-title-lg text-title-lg font-black text-primary">—</p>
+          </div>
+          <div class="flex gap-4 w-full sm:w-auto">
+            <a href="/turnos"
+              class="flex-1 sm:flex-none px-10 py-4 rounded-full border-2 border-outline text-on-surface font-bold text-center hover:bg-surface-variant transition-all active:scale-95">Cancelar</a>
+            <button id="confirm-btn" type="submit" disabled
+              class="flex-1 sm:flex-none px-10 py-4 rounded-full bg-primary text-on-primary font-bold shadow-xl hover:opacity-90 transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed">
+              Confirmar Turno
+              <span class="material-symbols-outlined">arrow_forward</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+  {% else %}
+  <div class="bg-surface-container-low p-xl rounded-2xl text-center text-on-surface-variant font-body-lg">
+    No hay turnos disponibles por el momento.
+  </div>
+  {% endif %}
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    var sel = document.getElementById('specialty');
+    if (sel) filterSpecialty(sel.value);
+  });
+
+  function filterSpecialty(spec) {
+    document.querySelectorAll('.doctor-card').forEach(function (c) {
+      c.classList.toggle('hidden', c.dataset.specialty !== spec);
+      c.classList.remove('selected');
+    });
+    document.querySelectorAll('.doctor-panel').forEach(function (p) { p.classList.add('hidden'); });
+    document.getElementById('empty-hint').classList.remove('hidden');
+    resetSlot();
+  }
+
+  function selectDoctor(id) {
+    document.querySelectorAll('.doctor-card').forEach(function (c) {
+      c.classList.toggle('selected', c.dataset.doctor === id);
+    });
+    document.querySelectorAll('.doctor-panel').forEach(function (p) {
+      p.classList.toggle('hidden', p.id !== 'panel-' + id);
+    });
+    document.getElementById('empty-hint').classList.add('hidden');
+    resetSlot();
+    var firstChip = document.querySelector('#panel-' + id + ' .date-chip');
+    if (firstChip) firstChip.click();
+  }
+
+  function selectDate(docId, date) {
+    var panel = document.getElementById('panel-' + docId);
+    panel.querySelectorAll('.date-chip').forEach(function (c) {
+      c.classList.toggle('chip-active', c.dataset.date === date);
+    });
+    panel.querySelectorAll('.slots').forEach(function (s) {
+      s.classList.toggle('hidden', s.dataset.date !== date);
+    });
+  }
+
+  function selectSlot(btn, apptId, label) {
+    document.querySelectorAll('.slot-btn').forEach(function (b) { b.classList.remove('slot-active'); });
+    btn.classList.add('slot-active');
+    document.getElementById('appointment_id').value = apptId;
+    document.getElementById('summary').textContent = label;
+    document.getElementById('confirm-btn').disabled = false;
+  }
+
+  function resetSlot() {
+    var ai = document.getElementById('appointment_id'); if (ai) ai.value = '';
+    var cb = document.getElementById('confirm-btn'); if (cb) cb.disabled = true;
+    var sm = document.getElementById('summary'); if (sm) sm.textContent = '—';
+    document.querySelectorAll('.slot-btn').forEach(function (b) { b.classList.remove('slot-active'); });
+  }
+</script>
+{% endblock %}

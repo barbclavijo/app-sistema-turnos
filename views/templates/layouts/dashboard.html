@@ -1,4 +1,4 @@
-{% extends "base.html" %} {% block body %}
+{% extends "layouts/base.html" %} {% block body %}
 <style>
   #sidebar {
     width: 18rem;
@@ -62,22 +62,23 @@
   <div class="flex items-center gap-3 ml-auto">
     <div class="text-right hidden sm:block leading-tight">
       <p class="font-label-lg text-label-lg text-primary font-bold">
-        Dra. Ana Gómez
+        {{ current_user.first_name }} {{ current_user.last_name }}
       </p>
-      <p class="text-[11px] text-on-surface-variant">Administradora</p>
+      <p class="text-[11px] text-on-surface-variant">{{ {'patient':'Paciente','admin':'Administrador','doctor':'Médico'}.get(current_user.role, current_user.role) }}</p>
     </div>
     <div
       class="h-10 w-10 rounded-full bg-surface-container-highest flex items-center justify-center border border-outline-variant text-primary">
       <span class="material-symbols-outlined">account_circle</span>
     </div>
-    <button
+    <a
+      href="/logout"
       title="Cerrar sesión"
       class="flex items-center gap-2 h-10 px-4 rounded-full border border-outline-variant text-on-surface hover:bg-surface-container-high transition-colors">
       <span class="material-symbols-outlined">logout</span>
       <span class="font-label-lg text-label-lg hidden sm:inline"
         >Cerrar sesión</span
       >
-    </button>
+    </a>
   </div>
 </header>
 
@@ -92,7 +93,7 @@
     </div>
     <div id="brand-text">
       <h2 class="font-label-lg text-label-lg font-black text-primary">
-        MedClinic Pro
+        ClinicalSys
       </h2>
       <p
         class="text-[10px] text-on-surface-variant uppercase tracking-widest font-bold">
@@ -101,32 +102,27 @@
     </div>
   </div>
   <nav class="flex-1 space-y-1 px-2">
+    {% if current_user and current_user.role == 'admin' %}
     <a
-      class="nav-link text-on-secondary-container flex items-center gap-4 px-4 py-3 hover:bg-surface-container-high rounded-full transition-all"
-      href="#">
-      <span class="material-symbols-outlined">dashboard</span>
-      <span class="nav-label font-label-lg text-label-lg">Panel Principal</span>
+      href="/create_patient"
+      class="nav-link {{ 'bg-primary text-on-primary shadow-md' if request.path == '/create_patient' else 'text-on-secondary-container hover:bg-surface-container-high' }} flex items-center gap-4 px-4 py-3 rounded-full transition-all">
+      <span class="material-symbols-outlined">group_add</span>
+      <span class="nav-label font-label-lg text-label-lg">Alta de Paciente</span>
     </a>
+    {% else %}
     <a
-      class="nav-link text-on-secondary-container flex items-center gap-4 px-4 py-3 hover:bg-surface-container-high rounded-full transition-all"
-      href="#">
+      href="/turnos"
+      class="nav-link {{ 'bg-primary text-on-primary shadow-md' if request.path == '/turnos' else 'text-on-secondary-container hover:bg-surface-container-high' }} flex items-center gap-4 px-4 py-3 rounded-full transition-all">
       <span class="material-symbols-outlined">calendar_today</span>
-      <span class="nav-label font-label-lg text-label-lg">Citas Médicas</span>
+      <span class="nav-label font-label-lg text-label-lg">Seleccionar Turno</span>
     </a>
     <a
-      class="nav-link bg-primary text-on-primary flex items-center gap-4 px-4 py-3 rounded-full shadow-md"
-      href="#">
-      <span class="material-symbols-outlined active-icon">groups</span>
-      <span class="nav-label font-label-lg text-label-lg">Pacientes</span>
+      href="/mis_turnos"
+      class="nav-link {{ 'bg-primary text-on-primary shadow-md' if request.path == '/mis_turnos' else 'text-on-secondary-container hover:bg-surface-container-high' }} flex items-center gap-4 px-4 py-3 rounded-full transition-all">
+      <span class="material-symbols-outlined">event_available</span>
+      <span class="nav-label font-label-lg text-label-lg">Mis Turnos</span>
     </a>
-    <a
-      class="nav-link text-on-secondary-container flex items-center gap-4 px-4 py-3 hover:bg-surface-container-high rounded-full transition-all"
-      href="#">
-      <span class="material-symbols-outlined">history_edu</span>
-      <span class="nav-label font-label-lg text-label-lg"
-        >Historial Clínico</span
-      >
-    </a>
+    {% endif %}
   </nav>
 </aside>
 
