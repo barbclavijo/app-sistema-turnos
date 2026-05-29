@@ -1,0 +1,203 @@
+{% extends "dashboard.html" %} {% block title %}Alta de Paciente - MedClinic
+Pro{% endblock %} {% block content %}
+<div class="max-w-4xl mx-auto px-gutter py-xl">
+  <!-- Header -->
+  <div class="mb-lg">
+    <div class="flex items-center gap-2 text-on-surface-variant mb-2">
+      <span class="font-label-lg text-label-lg">Pacientes</span>
+      <span class="material-symbols-outlined text-[16px]">chevron_right</span>
+      <span class="font-label-lg text-label-lg text-primary font-bold"
+        >Alta de Nuevo Paciente</span
+      >
+    </div>
+    <h1
+      class="font-headline-lg text-headline-lg text-primary font-black tracking-tight">
+      Registro de Paciente
+    </h1>
+    <p class="font-body-md text-body-md text-on-surface-variant">
+      Complete los datos fundamentales para crear el historial clínico del nuevo
+      paciente.
+    </p>
+  </div>
+
+  <!-- Form Card -->
+  <div
+    class="bg-surface-container-lowest rounded-[40px] shadow-sm border border-outline-variant/30 p-xl relative overflow-hidden">
+    <div
+      class="absolute top-0 right-0 w-32 h-32 bg-surface-container-high rounded-bl-full -mr-16 -mt-16 opacity-50"></div>
+
+    {% if message %}
+    <div
+      class="relative z-10 mb-lg flex items-center gap-2 rounded-2xl px-5 py-4 {% if 'correctamente' in message %}bg-primary text-white{% else %}bg-error-container text-on-error-container{% endif %}">
+      <span class="material-symbols-outlined"
+        >{% if 'correctamente' in message %}check_circle{% else %}error{% endif
+        %}</span
+      >
+      <span class="font-label-lg text-label-lg">{{ message }}</span>
+    </div>
+    {% endif %}
+
+    <form
+      method="POST"
+      class="grid grid-cols-1 md:grid-cols-2 gap-xl relative z-10">
+      <!-- Datos Personales -->
+      <div class="col-span-full mb-2">
+        <div class="flex items-center gap-2">
+          <span class="w-8 h-1 bg-primary rounded-full"></span>
+          <h3
+            class="font-title-md text-title-md font-bold text-primary uppercase tracking-wider">
+            Datos Personales
+          </h3>
+        </div>
+      </div>
+      <!-- Nombre -->
+      <div class="space-y-2">
+        <label
+          class="font-label-lg text-label-lg text-on-surface-variant px-1"
+          for="first_name"
+          >Nombre</label
+        >
+        <div class="relative group">
+          <input
+            class="w-full bg-surface-container-low border-none rounded-2xl px-5 py-4 focus:ring-2 focus:ring-primary transition-all text-body-lg"
+            id="first_name"
+            name="first_name"
+            placeholder="Ej. Juan Ignacio"
+            required
+            type="text" />
+          <span
+            class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-outline-variant group-focus-within:text-primary transition-colors"
+            >person</span
+          >
+        </div>
+      </div>
+      <!-- Apellido -->
+      <div class="space-y-2">
+        <label
+          class="font-label-lg text-label-lg text-on-surface-variant px-1"
+          for="last_name"
+          >Apellido</label
+        >
+        <div class="relative group">
+          <input
+            class="w-full bg-surface-container-low border-none rounded-2xl px-5 py-4 focus:ring-2 focus:ring-primary transition-all text-body-lg"
+            id="last_name"
+            name="last_name"
+            placeholder="Ej. Pérez García"
+            required
+            type="text" />
+          <span
+            class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-outline-variant group-focus-within:text-primary transition-colors"
+            >badge</span
+          >
+        </div>
+      </div>
+      <!-- DNI -->
+      <div class="space-y-2">
+        <label
+          class="font-label-lg text-label-lg text-on-surface-variant px-1"
+          for="dni"
+          >DNI / Documento Identidad</label
+        >
+        <div class="relative group">
+          <input
+            class="w-full bg-surface-container-low border-none rounded-2xl px-5 py-4 focus:ring-2 focus:ring-primary transition-all text-body-lg"
+            id="dni"
+            name="dni"
+            placeholder="12345678"
+            inputmode="numeric"
+            required
+            type="text" />
+          <span
+            class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-outline-variant group-focus-within:text-primary transition-colors"
+            >fingerprint</span
+          >
+        </div>
+      </div>
+      <!-- Fecha de Nacimiento -->
+      <div class="space-y-2">
+        <label
+          class="font-label-lg text-label-lg text-on-surface-variant px-1"
+          for="birth_date"
+          >Fecha de Nacimiento</label
+        >
+        <div class="relative group">
+          <input
+            class="w-full bg-surface-container-low border-none rounded-2xl px-5 py-4 focus:ring-2 focus:ring-primary transition-all text-body-lg"
+            id="birth_date"
+            name="birth_date"
+            required
+            type="date" />
+        </div>
+      </div>
+      <!-- Contacto -->
+      <div class="col-span-full mt-4 mb-2">
+        <div class="flex items-center gap-2">
+          <span class="w-8 h-1 bg-primary rounded-full"></span>
+          <h3
+            class="font-title-md text-title-md font-bold text-primary uppercase tracking-wider">
+            Contacto
+          </h3>
+        </div>
+      </div>
+      <!-- Email -->
+      <div class="space-y-2">
+        <label
+          class="font-label-lg text-label-lg text-on-surface-variant px-1"
+          for="email"
+          >Email</label
+        >
+        <div class="relative group">
+          <input
+            class="w-full bg-surface-container-low border-none rounded-2xl px-5 py-4 focus:ring-2 focus:ring-primary transition-all text-body-lg"
+            id="email"
+            name="email"
+            placeholder="paciente@ejemplo.com"
+            required
+            type="email" />
+          <span
+            class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-outline-variant group-focus-within:text-primary transition-colors"
+            >mail</span
+          >
+        </div>
+      </div>
+      <!-- Teléfono -->
+      <div class="space-y-2">
+        <label
+          class="font-label-lg text-label-lg text-on-surface-variant px-1"
+          for="phone"
+          >Teléfono</label
+        >
+        <div class="relative group">
+          <input
+            class="w-full bg-surface-container-low border-none rounded-2xl px-5 py-4 focus:ring-2 focus:ring-primary transition-all text-body-lg"
+            id="phone"
+            name="phone"
+            placeholder="+54 9 11 0000-0000"
+            required
+            type="tel" />
+          <span
+            class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-outline-variant group-focus-within:text-primary transition-colors"
+            >call</span
+          >
+        </div>
+      </div>
+      <!-- Acciones -->
+      <div
+        class="col-span-full flex flex-col sm:flex-row items-center gap-md mt-lg">
+        <button
+          class="w-full sm:flex-1 bg-primary text-white font-bold py-4 rounded-full shadow-lg hover:bg-zinc-800 transition-all active:scale-95 flex items-center justify-center gap-2 text-title-md"
+          type="submit">
+          <span class="material-symbols-outlined">how_to_reg</span>
+          Registrar Paciente
+        </button>
+        <a
+          class="w-full sm:w-auto px-10 py-4 font-bold rounded-full border border-outline-variant text-on-surface hover:bg-surface-container-high transition-all active:scale-95 text-title-md text-center"
+          href="/">
+          Cancelar
+        </a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
