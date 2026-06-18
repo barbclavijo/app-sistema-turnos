@@ -1,7 +1,8 @@
 from flask import (
     render_template,
     request,
-    redirect
+    redirect,
+    url_for
 )
 
 from services.setup_service import SetupService
@@ -13,7 +14,7 @@ class SetupController:
     def setup():
 
         if SetupService.is_done():
-            return redirect("/signin")
+            return redirect(url_for("auth.signin"))
 
         message = ""
 
@@ -37,7 +38,7 @@ class SetupController:
             else:
                 ok, error = SetupService.complete(first_name, last_name, email, password)
                 if ok:
-                    return redirect("/signin")
+                    return redirect(url_for("auth.signin"))
                 message = error
 
         return render_template("setup/setup.html", message=message)
