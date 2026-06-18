@@ -10,3 +10,14 @@ profile_bp = Blueprint("profile", __name__)
 @role_required("admin")
 def create_patient():
     return ProfileController.create_patient()
+
+@profile_bp.route("/patient", methods=["GET", "POST"])
+@role_required("admin")
+def patient():
+    return ProfileController.search_patient()
+
+
+@profile_bp.route("/patient/update_status", methods=["POST"])
+@role_required("admin")
+def update_status():
+    return ProfileController.update_appointment_status()

@@ -34,7 +34,8 @@ class Appointment(db.Model):
     def find_all_by_patient(cls, patient_user_id):
         return (
             cls.query
-            .filter_by(patient_user_id=patient_user_id, status="booked")
+            .filter(cls.patient_user_id == patient_user_id)
+            .filter(cls.status.in_(["booked", "attended"]))
             .order_by(cls.date, cls.time)
             .all()
         )
@@ -55,3 +56,37 @@ class Appointment(db.Model):
             db.session.rollback()
             print(f"Error al reservar el turno: {error}")
             return False
+
+    @classmethod
+    def update_status(cls, appointment_id, new_status_label):
+        """
+        Update appointment status based on Spanish label.
+        Allowed labels: 'Pendiente', 'Asistió', 'Cancelado'.
+        If 'Cancelado', free the slot (patient_user_id -> None, status -> 'available').
+        """
+        mapping = {
+            "Pendiente": "booked",
+            "Asistió": "attended",
+            "Cancelado": "available",
+        }
+
+        if new_status_label not in mapping:
+            return False, "Estado inválido."
+
+        try:
+            appointment = cls.query.filter_by(id=appointment_id).first()
+            if appointment is None:
+                return False, "Turno no encontrado."
+
+            if new_status_label == "Cancelado":
+                appointment.patient_user_id = None
+                appointment.status = mapping[new_status_label]
+            else:
+                appointment.status = mapping[new_status_label]
+
+            db.session.commit()
+            return True, None
+        except Exception as error:
+            db.session.rollback()
+            print(f"Error al actualizar estado del turno: {error}")
+            return False, str(error)
