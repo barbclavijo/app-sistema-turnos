@@ -26,9 +26,24 @@
   </div>
   {% endif %}
 
+  {# Flashed messages: use same format as patient page #}
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, msg in messages %}
+        <div class="mt-4 flex items-center gap-2 rounded-2xl px-5 py-4 {% if category=='success' %}bg-primary text-white{% elif category=='error' %}bg-error-container text-on-error-container{% else %}bg-surface-container-low text-on-surface-variant{% endif %}">
+          <span class="material-symbols-outlined">{% if category=='success' %}check_circle{% elif category=='error' %}error{% else %}info{% endif %}</span>
+          <span class="font-label-lg text-label-lg">{{ msg }}</span>
+        </div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
   {% if doctors %}
   <form method="POST">
     <input type="hidden" id="appointment_id" name="appointment_id" />
+    {% if request.args.get('dni') %}
+    <input type="hidden" name="dni" value="{{ request.args.get('dni') }}">
+    {% endif %}
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter items-start">
       <!-- Left: Specialty & Doctor -->
       <div class="lg:col-span-5 space-y-lg">

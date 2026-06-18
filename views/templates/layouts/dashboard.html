@@ -104,10 +104,10 @@
   <nav class="flex-1 space-y-1 px-2">
     {% if current_user and current_user.role == 'admin' %}
     <a
-      href="{{ url_for("profile.create_patient") }}"
-      class="nav-link {{ 'bg-primary text-on-primary shadow-md' if request.path == '/create_patient' else 'text-on-secondary-container hover:bg-surface-container-high' }} flex items-center gap-4 px-4 py-3 rounded-full transition-all">
+      href="{{ url_for("profile.patient") }}"
+      class="nav-link {{ 'bg-primary text-on-primary shadow-md' if request.path == '/patient' else 'text-on-secondary-container hover:bg-surface-container-high' }} flex items-center gap-4 px-4 py-3 rounded-full transition-all">
       <span class="material-symbols-outlined">group_add</span>
-      <span class="nav-label font-label-lg text-label-lg">Alta de Paciente</span>
+      <span class="nav-label font-label-lg text-label-lg">Pacientes</span>
     </a>
     {% else %}
     <a
@@ -124,6 +124,27 @@
     </a>
     {% endif %}
   </nav>
+
+  {% if current_user and current_user.role == 'admin' %}
+  <div class="px-4 pb-4 mt-auto">
+    {% set select_turns_path = url_for('appointment.select') %}
+    {% set dni_arg = request.args.get('dni') %}
+    {% if (request.path == '/patient' and patient) or (request.path == select_turns_path and dni_arg) %}
+    <a href="{{ url_for('appointment.select', dni=(patient.dni if request.path == '/patient' and patient else dni_arg)) }}"
+      class="nav-link flex items-center gap-4 px-4 py-3 rounded-full bg-primary text-on-primary shadow-md transition-all">
+      <span class="material-symbols-outlined">calendar_month</span>
+      <span class="nav-label font-label-lg text-label-lg">Asignar Turno</span>
+    </a>
+    {% else %}
+    <a href="{{ url_for('profile.create_patient') }}"
+      class="nav-link {{ 'bg-primary text-on-primary shadow-md' if request.path == '/create_patient' else 'text-on-secondary-container hover:bg-surface-container-high' }} flex items-center gap-4 px-4 py-3 rounded-full transition-all">
+      <span class="material-symbols-outlined">person_add</span>
+      <span class="nav-label font-label-lg text-label-lg">Alta Paciente</span>
+    </a>
+    {% endif %}
+  </div>
+  {% endif %}
+
 </aside>
 
 <!-- Desktop edge toggle -->
