@@ -1,11 +1,11 @@
-from flask import Flask, session, request, redirect
-from controllers.profile_controller import ProfileController
-from controllers.auth_controller import AuthController, login_required, role_required
-from controllers.appointment_controller import AppointmentController
-from controllers.setup_controller import SetupController
+from flask import Flask, session, request, redirect, url_for
 from services.setup_service import SetupService
 from models.database import db, init_db
 from models.user import User
+from routes.auth import auth_bp
+from routes.setup import setup_bp
+from routes.appointment import appointment_bp
+from routes.profile import profile_bp
 import config
 
 app = Flask(
@@ -17,6 +17,11 @@ app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + config.DB_PATH.replace("\
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db.init_app(app)
+
+app.register_blueprint(auth_bp)
+app.register_blueprint(setup_bp)
+app.register_blueprint(appointment_bp)
+app.register_blueprint(profile_bp)
 
 @app.context_processor
 def inject_current_user():
@@ -30,42 +35,8 @@ def require_initial_setup():
     if request.endpoint == "static" or request.path == "/setup":
         return
     if not SetupService.is_done():
-        return redirect("/setup")
+        return redirect(url_for("setup.setup"))
 
-@app.route("/setup", methods=["GET", "POST"])
-def setup():
-    return SetupController.setup()
-
-@app.route("/")
-@app.route("/signin", methods=["GET", "POST"])
-def signin():
-    return AuthController.signin()
-
-@app.route("/signup", methods=["GET", "POST"])
-def signup():
-    return AuthController.signup()
-
-@app.route("/logout")
-def logout():
-    return AuthController.logout()
-
-@app.route("/create_patient", methods=["GET", "POST"])
-@role_required("admin")
-def create_patient():
-    return ProfileController.create_patient()
-
-@app.route("/turnos", methods=["GET", "POST"])
-@login_required
-def turnos():
-    return AppointmentController.select()
-
-@app.route("/mis_turnos")
-@login_required
-def mis_turnos():
-    return AppointmentController.my_appointments()
-
-# Crea el esquema (tablas faltantes) y siembra datos base al arrancar.
-# Valido tanto para `python app.py` como para `flask run`.
 init_db(app)
 
 if __name__ == "__main__":

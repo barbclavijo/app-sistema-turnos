@@ -116,7 +116,7 @@
             <p id="summary" class="font-title-lg text-title-lg font-black text-primary">—</p>
           </div>
           <div class="flex gap-4 w-full sm:w-auto">
-            <a href="/turnos"
+            <a href="{{ url_for("appointment.select") }}"
               class="flex-1 sm:flex-none px-10 py-4 rounded-full border-2 border-outline text-on-surface font-bold text-center hover:bg-surface-variant transition-all active:scale-95">Cancelar</a>
             <button id="confirm-btn" type="submit" disabled
               class="flex-1 sm:flex-none px-10 py-4 rounded-full bg-primary text-on-primary font-bold shadow-xl hover:opacity-90 transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed">
