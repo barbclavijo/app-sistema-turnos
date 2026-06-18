@@ -4,7 +4,7 @@ from controllers.auth_controller import AuthController, login_required, role_req
 from controllers.appointment_controller import AppointmentController
 from controllers.setup_controller import SetupController
 from services.setup_service import SetupService
-from models.database import Database
+from models.database import db, init_db
 from models.user import User
 import config
 
@@ -13,6 +13,10 @@ app = Flask(
     template_folder="views/templates"
 )
 app.secret_key = config.SECRET_KEY
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + config.DB_PATH.replace("\\", "/")
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
+db.init_app(app)
 
 @app.context_processor
 def inject_current_user():
@@ -60,6 +64,9 @@ def turnos():
 def mis_turnos():
     return AppointmentController.my_appointments()
 
+# Crea el esquema (tablas faltantes) y siembra datos base al arrancar.
+# Valido tanto para `python app.py` como para `flask run`.
+init_db(app)
+
 if __name__ == "__main__":
-    Database.create_db()
     app.run(debug=True)

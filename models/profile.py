@@ -1,64 +1,36 @@
 import uuid
-import sqlite3
 
-from models.database import Database
+from models.database import db
 
 
-class Profile:
+class Profile(db.Model):
+    __tablename__ = "profiles"
 
-    def __init__(self, user_id, first_name, last_name,
-                 dni=None, birth_date=None, phone=None):
-        self.id = str(uuid.uuid4())
-        self.user_id = user_id
-        self.first_name = first_name
-        self.last_name = last_name
-        self.dni = dni
-        self.birth_date = birth_date
-        self.phone = phone
+    id = db.Column(db.String, primary_key=True, default=lambda: str(uuid.uuid4()))
+    user_id = db.Column(
+        db.String, db.ForeignKey("users.id"), nullable=False, unique=True
+    )
+    first_name = db.Column(db.String, nullable=False)
+    last_name = db.Column(db.String, nullable=False)
+    dni = db.Column(db.String, unique=True)
+    birth_date = db.Column(db.String)
+    phone = db.Column(db.String)
+    created_at = db.Column(
+        db.String, nullable=False, server_default=db.text("(datetime('now'))")
+    )
 
-    @staticmethod
-    def find_one_by_dni(dni):
-        connection = None
-        try:
-            connection = Database.connect()
-            connection.row_factory = sqlite3.Row
-            cursor = connection.cursor()
-            cursor.execute("SELECT * FROM profiles WHERE dni = ?", (dni,))
-            return cursor.fetchone()
-        except Exception as error:
-            print(f"Error al buscar perfil por dni: {error}")
-            return None
-        finally:
-            if connection:
-                connection.close()
+    user = db.relationship("User", back_populates="profile")
+
+    @classmethod
+    def find_one_by_dni(cls, dni):
+        return cls.query.filter_by(dni=dni).first()
 
     def save(self):
-        connection = None
         try:
-            connection = Database.connect()
-            cursor = connection.cursor()
-            cursor.execute(
-                """
-                INSERT INTO profiles (
-                    id, user_id, first_name, last_name, dni, birth_date, phone
-                )
-                VALUES (?, ?, ?, ?, ?, ?, ?)
-                """,
-                (
-                    self.id,
-                    self.user_id,
-                    self.first_name,
-                    self.last_name,
-                    self.dni,
-                    self.birth_date,
-                    self.phone
-                )
-            )
-            connection.commit()
+            db.session.add(self)
+            db.session.commit()
             return True
         except Exception as error:
+            db.session.rollback()
             print(f"Error al guardar el perfil: {error}")
             return False
-        finally:
-            if connection:
-                connection.close()

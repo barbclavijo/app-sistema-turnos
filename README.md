@@ -1,33 +1,37 @@
 # app-sistema-turnos
 
-Proyecto académico: Sistema web de gestión de turnos para una clínica médica, desarrollado con Flask, MVC y SQLITE.
+Proyecto académico: Sistema web de gestión de turnos para una clínica médica, desarrollado con Flask, MVC y SQLAlchemy (ORM) sobre SQLite.
 
 ## Requisitos
 
 - Python 3.13+
-- Flask (ya instalado en el entorno virtual `.venv`)
+- Dependencias listadas en `requirements.txt` (Flask, Flask-SQLAlchemy, SQLAlchemy)
 
 ## Cómo ejecutar (Windows)
 
-1. Activar el entorno virtual:
+1. Crear el entorno virtual (solo la primera vez):
+
+   ```
+   python -m venv .venv
+   ```
+
+2. Activar el entorno virtual:
 
    ```
    .venv\Scripts\activate
    ```
 
-2. (solo si Flask no está instalado) instalarlo:
+   En PowerShell el comando es `.venv\Scripts\Activate.ps1`. Con el entorno
+   activado, el prompt muestra `(.venv)` al inicio.
+
+3. Instalar las dependencias:
 
    ```
-   pip install flask
+   pip install -r requirements.txt
    ```
 
-3. Generar la base de datos y crear las tablas (aplica los `.sql` de `database/` en orden):
+4. Iniciar la aplicación:
 
-   ```
-   python -c "from models.database import Database; Database.create_db()"
-   ```
-
-4. Iniciar la aplicación (si la DB no existe, también la genera):
    ```
    python app.py
    ```
@@ -36,5 +40,6 @@ La app queda disponible en http://127.0.0.1:5000
 
 ## Base de datos
 
-- El archivo `database/consultorio.db` (SQLite) se crea automáticamente al conectarse; no se define en una query.
-- El esquema de tablas vive en `database/01_schema.sql` y los datos ficticios (médicos y turnos de ejemplo) en `database/02_mockup_data.sql`. `Database.create_db()` aplica todos los `.sql` de `database/`.
+- Se usa SQLAlchemy (ORM) a través de Flask-SQLAlchemy. La conexión apunta a `database/consultorio.db` (SQLite), configurada en `app.py` mediante `SQLALCHEMY_DATABASE_URI`.
+- El esquema se deriva de los modelos ORM (carpeta `models/`) y se crea con `db.create_all()`; los datos de ejemplo se cargan con `seed_data()` (idempotente). Ambos se ejecutan al arrancar desde `init_db(app)` en `models/database.py`.
+- Para regenerar la base desde cero, borrá `database/consultorio.db` y volvé a iniciar la app: se recreará el esquema y se generan los datos.
