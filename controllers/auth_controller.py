@@ -27,7 +27,7 @@ def role_required(role):
             if "user_id" not in session:
                 return redirect("/signin")
             user = User.find_one_with_profile(session["user_id"])
-            if not user or user["role"] != role:
+            if not user or user.role != role:
                 return redirect("/turnos")
             return view(*args, **kwargs)
         return wrapper
@@ -52,8 +52,8 @@ class AuthController:
                 user = AuthService.authenticate(email, password)
 
                 if user:
-                    session["user_id"] = user["id"]
-                    if user["role"] == "admin":
+                    session["user_id"] = user.id
+                    if user.role == "admin":
                         return redirect("/create_patient")
                     return redirect("/turnos")
 

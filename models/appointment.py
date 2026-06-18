@@ -1,80 +1,57 @@
-import sqlite3
+import uuid
 
-from models.database import Database
+from models.database import db
+from models.doctor import Doctor
 
 
-class Appointment:
+class Appointment(db.Model):
+    __tablename__ = "appointments"
 
-    @staticmethod
-    def find_all_available():
-        connection = None
+    id = db.Column(db.String, primary_key=True, default=lambda: str(uuid.uuid4()))
+    doctor_id = db.Column(db.String, db.ForeignKey("doctors.id"), nullable=False)
+    date = db.Column(db.String, nullable=False)
+    time = db.Column(db.String, nullable=False)
+    patient_user_id = db.Column(db.String, db.ForeignKey("users.id"))
+    status = db.Column(db.String, nullable=False, default="available")
+    created_at = db.Column(
+        db.String, nullable=False, server_default=db.text("(datetime('now'))")
+    )
+
+    doctor = db.relationship("Doctor", back_populates="appointments")
+    patient = db.relationship("User")
+
+    @classmethod
+    def find_all_available(cls):
+        return (
+            cls.query
+            .join(Doctor)
+            .filter(cls.status == "available")
+            .order_by(Doctor.last_name, cls.date, cls.time)
+            .all()
+        )
+
+    @classmethod
+    def find_all_by_patient(cls, patient_user_id):
+        return (
+            cls.query
+            .filter_by(patient_user_id=patient_user_id, status="booked")
+            .order_by(cls.date, cls.time)
+            .all()
+        )
+
+    @classmethod
+    def book(cls, appointment_id, patient_user_id):
         try:
-            connection = Database.connect()
-            connection.row_factory = sqlite3.Row
-            cursor = connection.cursor()
-            cursor.execute(
-                """
-                SELECT a.id, a.date, a.time,
-                       d.id AS doctor_id, d.first_name, d.last_name, d.specialty
-                FROM appointments a
-                JOIN doctors d ON d.id = a.doctor_id
-                WHERE a.status = 'available'
-                ORDER BY d.last_name, a.date, a.time
-                """
-            )
-            return cursor.fetchall()
+            appointment = cls.query.filter_by(
+                id=appointment_id, status="available"
+            ).first()
+            if appointment is None:
+                return False
+            appointment.patient_user_id = patient_user_id
+            appointment.status = "booked"
+            db.session.commit()
+            return True
         except Exception as error:
-            print(f"Error al listar turnos disponibles: {error}")
-            return []
-        finally:
-            if connection:
-                connection.close()
-
-    @staticmethod
-    def find_all_by_patient(patient_user_id):
-        connection = None
-        try:
-            connection = Database.connect()
-            connection.row_factory = sqlite3.Row
-            cursor = connection.cursor()
-            cursor.execute(
-                """
-                SELECT a.id, a.date, a.time,
-                       d.first_name, d.last_name, d.specialty
-                FROM appointments a
-                JOIN doctors d ON d.id = a.doctor_id
-                WHERE a.patient_user_id = ? AND a.status = 'booked'
-                ORDER BY a.date, a.time
-                """,
-                (patient_user_id,)
-            )
-            return cursor.fetchall()
-        except Exception as error:
-            print(f"Error al listar turnos del paciente: {error}")
-            return []
-        finally:
-            if connection:
-                connection.close()
-
-    @staticmethod
-    def book(appointment_id, patient_user_id):
-        connection = None
-        try:
-            connection = Database.connect()
-            cursor = connection.cursor()
-            cursor.execute(
-                """
-                UPDATE appointments
-                SET patient_user_id = ?, status = 'booked'
-                WHERE id = ? AND status = 'available'
-                """,
-                (patient_user_id, appointment_id)
-            )
-            connection.commit()
-            return cursor.rowcount > 0
-        except Exception as error:
+            db.session.rollback()
             print(f"Error al reservar el turno: {error}")
             return False
-        finally:
-            if connection:
-                connection.close()
