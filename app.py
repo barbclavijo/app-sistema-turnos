@@ -7,6 +7,7 @@ from routes.setup import setup_bp
 from routes.appointment import appointment_bp
 from routes.profile import profile_bp
 from routes.panel import panel_bp
+from routes.doctor import doctor_bp
 import config
 
 app = Flask(
@@ -24,6 +25,7 @@ app.register_blueprint(setup_bp)
 app.register_blueprint(appointment_bp)
 app.register_blueprint(profile_bp)
 app.register_blueprint(panel_bp)
+app.register_blueprint(doctor_bp)
 
 @app.context_processor
 def inject_current_user():

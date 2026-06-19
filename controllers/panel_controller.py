@@ -1,5 +1,6 @@
 from flask import render_template, request, redirect, url_for
 from models.profile import Profile
+from models.user import User
 from models.appointment import Appointment
 from datetime import date
 
@@ -17,7 +18,12 @@ class PanelController:
         pending_appointments = 0
         upcoming = []
         try:
-            patients_count = Profile.query.count()
+            # Count only profiles belonging to users with role 'patient'
+            patients_count = (
+                Profile.query.join(User, Profile.user)
+                .filter(User.role == 'patient')
+                .count()
+            )
             today = date.today().isoformat()
             todays_appointments = Appointment.query.filter_by(date=today).count()
             pending_appointments = Appointment.query.filter_by(status='booked').count()

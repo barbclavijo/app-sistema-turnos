@@ -55,7 +55,7 @@ class AuthController:
                 if user:
                     session["user_id"] = user.id
                     if user.role == "admin":
-                        return redirect(url_for("profile.create_patient"))
+                        return redirect(url_for("panel.index"))
                     return redirect(url_for("appointment.select"))
 
                 message = "Email o contraseña incorrectos."
