@@ -114,6 +114,11 @@
       <span class="material-symbols-outlined">group_add</span>
       <span class="nav-label font-label-lg text-label-lg">Pacientes</span>
     </a>
+    <a href="{{ url_for('doctor.create') }}"
+      class="nav-link {{ 'bg-primary text-on-primary shadow-md' if request.path == '/doctor/create' else 'text-on-secondary-container hover:bg-surface-container-high' }} flex items-center gap-4 px-4 py-3 rounded-full transition-all">
+      <span class="material-symbols-outlined">medical_information</span>
+      <span class="nav-label font-label-lg text-label-lg">Médicos</span>
+    </a>
         <a href="{{ url_for('profile.patient') }}"
       class="nav-link {{ 'bg-primary text-on-primary shadow-md' if request.path == '/patient' else 'text-on-secondary-container hover:bg-surface-container-high' }} flex items-center gap-4 px-4 py-3 rounded-full transition-all">
       <span class="material-symbols-outlined">group_add</span>
