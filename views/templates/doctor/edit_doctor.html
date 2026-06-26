@@ -1,0 +1,115 @@
+{% extends "layouts/dashboard.html" %}
+
+{% block title %}Editar Médico - ClinicalSys{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-gutter py-xl space-y-6">
+
+  <!-- Breadcrumb / Header -->
+  <div>
+    <div class="flex items-center gap-2 text-on-surface-variant mb-2">
+      <a href="{{ url_for('doctor.index') }}" class="font-label-lg text-label-lg hover:text-primary">Médicos</a>
+      <span class="material-symbols-outlined text-[16px]">chevron_right</span>
+      <span class="font-label-lg text-label-lg text-primary font-bold">Editar</span>
+    </div>
+    <h1 class="font-headline-lg text-headline-lg text-primary font-black tracking-tight">
+      Dr/a. {{ doctor.first_name }} {{ doctor.last_name }}
+    </h1>
+  </div>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, msg in messages %}
+        <div class="flex items-center gap-2 rounded-2xl px-5 py-4 {% if category=='success' %}bg-primary text-white{% elif category=='error' %}bg-error-container text-on-error-container{% else %}bg-surface-container-low text-on-surface-variant{% endif %}">
+          <span class="material-symbols-outlined">{% if category=='success' %}check_circle{% elif category=='error' %}error{% else %}info{% endif %}</span>
+          <span class="font-label-lg text-label-lg">{{ msg }}</span>
+        </div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  <!-- Especialidad -->
+  <div class="bg-surface-container-low rounded-3xl p-6 shadow-sm">
+    <h3 class="font-title-md text-title-md font-bold mb-4 flex items-center gap-2">
+      <span class="material-symbols-outlined text-primary">medical_information</span>
+      Especialidad
+    </h3>
+    <form method="POST" class="flex flex-col sm:flex-row gap-3">
+      <input type="hidden" name="action" value="specialty">
+      <select name="specialty" required
+        class="flex-1 bg-surface-container-lowest border-2 border-outline-variant rounded-xl px-4 py-3 focus:border-primary focus:ring-0">
+        {% for s in specialties %}
+        <option value="{{ s.name }}" {% if s.name == doctor.specialty %}selected{% endif %}>{{ s.name }}</option>
+        {% endfor %}
+      </select>
+      <button type="submit" class="px-6 py-3 rounded-full bg-primary text-on-primary font-bold hover:opacity-90 transition-all active:scale-95">
+        Guardar especialidad
+      </button>
+    </form>
+  </div>
+
+  <!-- Disponibilidad semanal -->
+  <div class="bg-surface-container-low rounded-3xl p-6 shadow-sm">
+    <h3 class="font-title-md text-title-md font-bold mb-1 flex items-center gap-2">
+      <span class="material-symbols-outlined text-primary">event_repeat</span>
+      Disponibilidad semanal
+    </h3>
+    <p class="text-body-md text-on-surface-variant mb-5">
+      Los horarios cargados se repiten todas las semanas. El sistema genera los turnos disponibles para las próximas 4 semanas automáticamente.
+    </p>
+
+    <!-- Listado actual -->
+    {% if availabilities %}
+    <div class="space-y-2 mb-6">
+      {% for a in availabilities %}
+      <div class="flex items-center justify-between bg-surface-container-lowest rounded-2xl px-4 py-3">
+        <div class="flex items-center gap-3">
+          <span class="material-symbols-outlined text-on-surface-variant">schedule</span>
+          <span class="font-body-lg text-body-lg font-medium">{{ a.weekday_label }} • {{ a.time }} hs</span>
+        </div>
+        <form method="POST" onsubmit="return confirm('¿Quitar este horario? Se eliminarán sus turnos futuros aún disponibles.');">
+          <input type="hidden" name="action" value="remove">
+          <input type="hidden" name="availability_id" value="{{ a.id }}">
+          <button type="submit" class="inline-flex items-center gap-1 px-4 py-2 rounded-full text-error hover:bg-error-container transition-all">
+            <span class="material-symbols-outlined text-[20px]">delete</span>
+            Quitar
+          </button>
+        </form>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-8 text-on-surface-variant">
+      <span class="material-symbols-outlined text-5xl text-surface-container-high">event_busy</span>
+      <p class="mt-2">Todavía no hay horarios cargados.</p>
+    </div>
+    {% endif %}
+
+    <!-- Agregar nuevo -->
+    <form method="POST" class="flex flex-col sm:flex-row gap-3 border-t border-outline-variant pt-5">
+      <input type="hidden" name="action" value="add">
+      <select name="weekday" required
+        class="flex-1 bg-surface-container-lowest border-2 border-outline-variant rounded-xl px-4 py-3 focus:border-primary focus:ring-0">
+        <option value="" disabled selected>Día de la semana</option>
+        {% for value, label in weekday_options %}
+        <option value="{{ value }}">{{ label }}</option>
+        {% endfor %}
+      </select>
+      <input type="time" name="time" required
+        class="flex-1 bg-surface-container-lowest border-2 border-outline-variant rounded-xl px-4 py-3 focus:border-primary focus:ring-0">
+      <button type="submit" class="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-primary text-on-primary font-bold hover:opacity-90 transition-all active:scale-95">
+        <span class="material-symbols-outlined">add</span>
+        Agregar
+      </button>
+    </form>
+  </div>
+
+  <div>
+    <a href="{{ url_for('doctor.index') }}" class="inline-flex items-center gap-2 px-6 py-3 rounded-full border-2 border-outline-variant text-on-surface font-bold hover:bg-surface-container-high transition-all">
+      <span class="material-symbols-outlined">arrow_back</span>
+      Volver a Médicos
+    </a>
+  </div>
+
+</div>
+{% endblock %}

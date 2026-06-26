@@ -18,6 +18,27 @@
     <p class="font-body-lg text-body-lg text-on-surface-variant">Completá los pasos para agendar una nueva cita médica.</p>
   </div>
 
+  {% if assign_patient %}
+  <!-- Banner de contexto: a qué paciente se le asigna el turno -->
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-primary text-on-primary p-lg rounded-2xl shadow-md">
+    <div class="flex items-center gap-4">
+      <div class="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center">
+        <span class="material-symbols-outlined">person</span>
+      </div>
+      <div>
+        <p class="text-label-sm uppercase tracking-wider font-bold opacity-80">Asignando turno a</p>
+        <p class="font-title-md text-title-md font-bold">{{ assign_patient.first_name }} {{ assign_patient.last_name }}</p>
+        <p class="text-body-md opacity-90">DNI: {{ assign_patient.dni }}</p>
+      </div>
+    </div>
+    <a href="{{ url_for('profile.patient', dni=assign_patient.dni) }}"
+      class="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full bg-white/15 hover:bg-white/25 font-bold transition-all active:scale-95">
+      <span class="material-symbols-outlined">arrow_back</span>
+      Volver a la ficha
+    </a>
+  </div>
+  {% endif %}
+
   {% if message %}
   <div
     class="flex items-center gap-2 rounded-2xl px-5 py-4 {% if 'correctamente' in message %}bg-primary text-white{% else %}bg-error-container text-on-error-container{% endif %}">
@@ -26,9 +47,24 @@
   </div>
   {% endif %}
 
+  {# Flashed messages: use same format as patient page #}
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, msg in messages %}
+        <div class="mt-4 flex items-center gap-2 rounded-2xl px-5 py-4 {% if category=='success' %}bg-primary text-white{% elif category=='error' %}bg-error-container text-on-error-container{% else %}bg-surface-container-low text-on-surface-variant{% endif %}">
+          <span class="material-symbols-outlined">{% if category=='success' %}check_circle{% elif category=='error' %}error{% else %}info{% endif %}</span>
+          <span class="font-label-lg text-label-lg">{{ msg }}</span>
+        </div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
   {% if doctors %}
   <form method="POST">
     <input type="hidden" id="appointment_id" name="appointment_id" />
+    {% if assign_dni %}
+    <input type="hidden" name="dni" value="{{ assign_dni }}">
+    {% endif %}
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter items-start">
       <!-- Left: Specialty & Doctor -->
       <div class="lg:col-span-5 space-y-lg">
@@ -116,7 +152,7 @@
             <p id="summary" class="font-title-lg text-title-lg font-black text-primary">—</p>
           </div>
           <div class="flex gap-4 w-full sm:w-auto">
-            <a href="/turnos"
+            <a href="{{ url_for("appointment.select") }}"
               class="flex-1 sm:flex-none px-10 py-4 rounded-full border-2 border-outline text-on-surface font-bold text-center hover:bg-surface-variant transition-all active:scale-95">Cancelar</a>
             <button id="confirm-btn" type="submit" disabled
               class="flex-1 sm:flex-none px-10 py-4 rounded-full bg-primary text-on-primary font-bold shadow-xl hover:opacity-90 transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed">

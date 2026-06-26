@@ -1,0 +1,72 @@
+{% extends "layouts/dashboard.html" %}
+
+{% block title %}Panel Principal - ClinicalSys{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto px-gutter py-xl">
+  <div class="mb-6 bg-surface-container-low rounded-3xl p-4 shadow-sm">
+    <form method="POST" class="flex gap-3 items-center">
+      <input type="text" name="dni" placeholder="Buscar pacientes por DNI..."
+        class="flex-1 bg-white rounded-2xl px-5 py-3 border border-outline-variant focus:ring-2 focus:ring-primary">
+      <button type="submit" class="px-6 py-3 rounded-2xl bg-primary text-on-primary font-bold">Buscar</button>
+    </form>
+  </div>
+
+  <div class="mb-6 bg-gradient-to-r from-black to-gray-800 text-white rounded-2xl p-8 shadow-md">
+    <h2 class="font-headline-lg text-headline-lg font-bold">La salud es tu mayor riqueza</h2>
+    <p class="text-on-surface-variant mt-2 text-white">Bienvenido de nuevo. Revisá las próximas citas o buscá un paciente por DNI.</p>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
+    <div class="col-span-2">
+      <div class="grid grid-cols-3 gap-4 mb-4">
+        <div class="bg-surface-container-low rounded-2xl p-4 shadow-sm">
+          <div class="font-label-lg text-label-lg text-on-surface-variant">Pacientes</div>
+          <div class="font-headline-md text-headline-md font-bold text-primary mt-2">{{ stats.patients_count }}</div>
+        </div>
+        <div class="bg-surface-container-low rounded-2xl p-4 shadow-sm">
+          <div class="font-label-lg text-label-lg text-on-surface-variant">Turnos Hoy</div>
+          <div class="font-headline-md text-headline-md font-bold text-primary mt-2">{{ stats.todays_appointments }}</div>
+        </div>
+        <div class="bg-surface-container-low rounded-2xl p-4 shadow-sm">
+          <div class="font-label-lg text-label-lg text-on-surface-variant">Pendientes</div>
+          <div class="font-headline-md text-headline-md font-bold text-primary mt-2">{{ stats.pending_appointments }}</div>
+        </div>
+      </div>
+
+      <div class="bg-surface-container-low rounded-2xl p-4 shadow-sm">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="font-bold text-lg">Próximas Citas</h3>
+        </div>
+
+        {% if upcoming %}
+        <div class="space-y-3">
+          {% for a in upcoming %}
+          <div class="bg-surface-container-lowest rounded-2xl p-3 flex items-center justify-between">
+            <div>
+              <p class="font-bold">Dr. {{ a.doctor.first_name }} {{ a.doctor.last_name }}</p>
+              <p class="text-sm text-on-surface-variant">{{ a.date }} • {{ a.time }}</p>
+            </div>
+            <div class="text-sm">
+              {% if a.patient %}
+              <a href="{{ url_for('profile.patient', dni=(a.patient.profile.dni if a.patient.profile else '')) }}" class="text-primary font-bold">Ver Paciente</a>
+              {% else %}
+              <a href="{{ url_for('appointment.select', dni='') }}" class="text-primary font-bold">Asignar</a>
+              {% endif %}
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-8 text-on-surface-variant">No hay próximas citas.</div>
+        {% endif %}
+      </div>
+    </div>
+
+    <div>
+      <div class="bg-surface-container-low rounded-2xl p-4 shadow-sm h-full">
+    </div>
+  </div>
+
+</div>
+{% endblock %}

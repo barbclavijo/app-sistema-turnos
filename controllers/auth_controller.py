@@ -4,6 +4,7 @@ from flask import (
     render_template,
     request,
     redirect,
+    url_for,
     session
 )
 
@@ -15,7 +16,7 @@ def login_required(view):
     @wraps(view)
     def wrapper(*args, **kwargs):
         if "user_id" not in session:
-            return redirect("/signin")
+            return redirect(url_for("auth.signin"))
         return view(*args, **kwargs)
     return wrapper
 
@@ -25,10 +26,10 @@ def role_required(role):
         @wraps(view)
         def wrapper(*args, **kwargs):
             if "user_id" not in session:
-                return redirect("/signin")
+                return redirect(url_for("auth.signin"))
             user = User.find_one_with_profile(session["user_id"])
-            if not user or user["role"] != role:
-                return redirect("/turnos")
+            if not user or user.role != role:
+                return redirect(url_for("appointment.select"))
             return view(*args, **kwargs)
         return wrapper
     return decorator
@@ -52,10 +53,10 @@ class AuthController:
                 user = AuthService.authenticate(email, password)
 
                 if user:
-                    session["user_id"] = user["id"]
-                    if user["role"] == "admin":
-                        return redirect("/create_patient")
-                    return redirect("/turnos")
+                    session["user_id"] = user.id
+                    if user.role == "admin":
+                        return redirect(url_for("panel.index"))
+                    return redirect(url_for("appointment.select"))
 
                 message = "Email o contraseña incorrectos."
 
@@ -92,4 +93,4 @@ class AuthController:
     @staticmethod
     def logout():
         session.clear()
-        return redirect("/signin")
+        return redirect(url_for("auth.signin"))

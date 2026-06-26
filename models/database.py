@@ -1,42 +1,58 @@
-import os
-import glob
-import sqlite3
-import config
-
-SQL_DIR = os.path.join(config.BASE_DIR, "database")
+from flask_sqlalchemy import SQLAlchemy
 
 
-class Database:
+# Se inicializa en app.py con db.init_app(app).
+db = SQLAlchemy()
 
-    @staticmethod
-    def connect():
-        return sqlite3.connect(config.DB_PATH)
 
-    @staticmethod
-    def create_db():
+def init_db(app):
+    with app.app_context():
+       
+        import models.user       
+        import models.profile    
+        import models.doctor     
+        import models.specialty 
+        import models.appointment  
+        import models.availability
 
-        connection = None
+        db.create_all()
+        seed_data()
 
-        try:
+        # Materializar los turnos disponibles de las próximas 4 semanas a partir de las plantillas
+        from models.availability import generate_upcoming_slots
+        generate_upcoming_slots(weeks=4)
 
-            connection = Database.connect()
 
-            for path in sorted(glob.glob(os.path.join(SQL_DIR, "*.sql"))):
-                with open(path, encoding="utf-8") as sql_file:
-                    connection.executescript(sql_file.read())
+def seed_data():
+    from models.doctor import Doctor
+    from models.specialty import Specialty
+    from models.availability import Availability
 
-            connection.commit()
+    default_specialties = [
+        'Cardiología', 'Dermatología', 'Pediatría', 'Neurología', 'Ginecología',
+        'Traumatología', 'Oftalmología', 'Psiquiatría', 'Endocrinología', 'Nefrología'
+    ]
+    existing = {s.name for s in Specialty.query.all()}
+    for name in default_specialties:
+        if name not in existing:
+            db.session.add(Specialty(name=name))
 
-            print("Esquema y datos aplicados correctamente.")
+    if Doctor.query.first() is None:
+        db.session.add_all([
+            Doctor(id="doc-elena", first_name="Elena", last_name="Rivas", specialty="Cardiología"),
+            Doctor(id="doc-marcos", first_name="Marcos", last_name="Julián", specialty="Dermatología"),
+        ])
 
-        except (sqlite3.Error, OSError) as error:
+        # Plantillas de disponibilidad semanal recurrente de ejemplo.
+        # weekday: 0=Lunes ... 6=Domingo
+        example_templates = {
+            "doc-elena": [(0, "09:00"), (0, "09:30"), (2, "10:00"), (4, "14:00")],
+            "doc-marcos": [(1, "11:00"), (3, "11:30"), (3, "15:00")],
+        }
+        for doctor_id, slots in example_templates.items():
+            for weekday, time in slots:
+                db.session.add(
+                    Availability(doctor_id=doctor_id, weekday=weekday, time=time)
+                )
 
-            print(
-                f"Error al aplicar el esquema: {error}"
-            )
-
-        finally:
-
-            if connection:
-                connection.close()
-                print("Conexión cerrada.")
+    db.session.commit()

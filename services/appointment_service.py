@@ -15,14 +15,14 @@ class AppointmentService:
     def find_available():
         by_id = {}
         for r in Appointment.find_all_available():
-            doctor = by_id.setdefault(r["doctor_id"], {
-                "id": r["doctor_id"],
-                "name": f"{r['first_name']} {r['last_name']}",
-                "specialty": r["specialty"],
+            doctor = by_id.setdefault(r.doctor.id, {
+                "id": r.doctor.id,
+                "name": f"{r.doctor.first_name} {r.doctor.last_name}",
+                "specialty": r.doctor.specialty,
                 "dates": {}
             })
-            doctor["dates"].setdefault(r["date"], []).append(
-                {"id": r["id"], "time": r["time"]}
+            doctor["dates"].setdefault(r.date, []).append(
+                {"id": r.id, "time": r.time}
             )
 
         doctors = []
