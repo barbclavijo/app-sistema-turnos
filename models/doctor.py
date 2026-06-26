@@ -10,3 +10,8 @@ class Doctor(db.Model):
     specialty = db.Column(db.String, nullable=False)
 
     appointments = db.relationship("Appointment", back_populates="doctor")
+    availabilities = db.relationship(
+        "Availability",
+        back_populates="doctor",
+        cascade="all, delete-orphan",
+    )

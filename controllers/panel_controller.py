@@ -18,7 +18,7 @@ class PanelController:
         pending_appointments = 0
         upcoming = []
         try:
-            # Count only profiles belonging to users with role 'patient'
+            # Contar solo perfiles de usuarios con rol 'patient'
             patients_count = (
                 Profile.query.join(User, Profile.user)
                 .filter(User.role == 'patient')

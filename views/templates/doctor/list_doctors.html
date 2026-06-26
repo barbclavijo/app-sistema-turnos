@@ -1,0 +1,74 @@
+{% extends "layouts/dashboard.html" %}
+
+{% block title %}Médicos - ClinicalSys{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto px-gutter py-xl">
+
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-lg">
+    <div>
+      <h1 class="font-headline-lg text-headline-lg text-primary font-black tracking-tight">Médicos</h1>
+      <p class="font-body-md text-body-md text-on-surface-variant">Gestioná los médicos, su especialidad y su disponibilidad semanal.</p>
+    </div>
+    <a href="{{ url_for('doctor.create') }}"
+      class="inline-flex items-center justify-center gap-2 bg-primary text-on-primary font-bold px-6 py-3 rounded-full shadow-md hover:opacity-90 transition-all active:scale-95">
+      <span class="material-symbols-outlined">person_add</span>
+      Alta médico
+    </a>
+  </div>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, msg in messages %}
+        <div class="mb-4 flex items-center gap-2 rounded-2xl px-5 py-4 {% if category=='success' %}bg-primary text-white{% elif category=='error' %}bg-error-container text-on-error-container{% else %}bg-surface-container-low text-on-surface-variant{% endif %}">
+          <span class="material-symbols-outlined">{% if category=='success' %}check_circle{% elif category=='error' %}error{% else %}info{% endif %}</span>
+          <span class="font-label-lg text-label-lg">{{ msg }}</span>
+        </div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  {% if doctors %}
+  <div class="space-y-3">
+    {% for d in doctors %}
+    <div class="bg-surface-container-low rounded-3xl p-4 shadow-sm flex flex-col sm:flex-row sm:items-center gap-4">
+      <div class="flex items-center gap-4 flex-1">
+        <div class="w-14 h-14 rounded-2xl bg-surface-container-high flex items-center justify-center text-primary">
+          <span class="material-symbols-outlined">stethoscope</span>
+        </div>
+        <div>
+          <h3 class="font-title-md text-title-md font-bold text-primary">Dr/a. {{ d.first_name }} {{ d.last_name }}</h3>
+          <p class="font-body-md text-body-md text-on-surface-variant">{{ d.specialty }}</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-4">
+        <div class="text-right hidden md:block">
+          <p class="text-label-sm font-bold uppercase tracking-wider text-on-surface-variant">Disponibilidad</p>
+          {% if d.availabilities %}
+          <p class="font-body-md text-body-md">{{ d.availabilities | length }} horario(s) semanal(es)</p>
+          {% else %}
+          <p class="font-body-md text-body-md text-error">Sin disponibilidad</p>
+          {% endif %}
+        </div>
+        <a href="{{ url_for('doctor.edit', doctor_id=d.id) }}"
+          class="inline-flex items-center gap-2 px-5 py-3 rounded-full border-2 border-outline-variant text-on-surface font-bold hover:bg-surface-container-high transition-all active:scale-95">
+          <span class="material-symbols-outlined">edit</span>
+          Editar
+        </a>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="bg-surface-container-low p-xl rounded-3xl text-center">
+    <span class="material-symbols-outlined text-7xl text-surface-container-high">stethoscope</span>
+    <h3 class="font-title-lg text-title-lg font-bold mt-4">No hay médicos cargados</h3>
+    <p class="text-on-surface-variant mt-2 mb-6">Comenzá dando de alta el primer médico.</p>
+    <a href="{{ url_for('doctor.create') }}" class="bg-primary text-on-primary px-8 py-3 rounded-full font-bold">Alta médico</a>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}
