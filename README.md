@@ -5,7 +5,7 @@ Proyecto académico: Sistema web de gestión de turnos para una clínica médica
 ## Requisitos
 
 - Python 3.13+
-- Dependencias listadas en `requirements.txt` (Flask, Flask-SQLAlchemy, SQLAlchemy)
+- Dependencias listadas en `requirements.txt` (Flask, Flask-SQLAlchemy, SQLAlchemy, python-dotenv)
 
 ## Cómo ejecutar (Windows)
 
@@ -33,10 +33,24 @@ Proyecto académico: Sistema web de gestión de turnos para una clínica médica
 4. Iniciar la aplicación:
 
    ```
+   //Preferiblemente con
+   Flask run
+   //O también con
    python app.py
    ```
 
 La app queda disponible en http://127.0.0.1:5000
+
+## Configuración (.env)
+
+- La configuración se centraliza en `config.py`, que carga las variables de entorno desde un archivo `.env`
+- Creá un archivo `.env` en la raíz del proyecto con, al menos, la clave secreta de Flask:
+
+  ```
+  SECRET_KEY="cambia-esta-clave"
+  ```
+
+- Si no existe el `.env` o falta `SECRET_KEY`, `config.py` usa el valor por defecto `dev-secret-change-me` (solo para desarrollo).
 
 ## Base de datos
 
