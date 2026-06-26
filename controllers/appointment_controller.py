@@ -7,6 +7,7 @@ from flask import (
 from services.appointment_service import AppointmentService
 from models.profile import Profile
 from models.user import User
+from models.availability import generate_upcoming_slots
 from flask import redirect, url_for, session, flash
 
 
@@ -17,9 +18,13 @@ class AppointmentController:
 
         message = ""
 
+        try:
+            generate_upcoming_slots(weeks=4)
+        except Exception as error:
+            print(f"Error al generar turnos disponibles: {error}")
+
         if request.method == "POST":
             appointment_id = request.form.get("appointment_id")
-            # if admin is assigning a slot to a patient, a hidden 'dni' may be provided
             dni = request.form.get('dni') or request.args.get('dni')
 
             if dni:
@@ -52,11 +57,17 @@ class AppointmentController:
 
         doctors, specialties = AppointmentService.find_available()
 
+        # si un admin llega con un DNI, mostramos a que paciente se le está asignando el turno.
+        assign_dni = request.form.get('dni') or request.args.get('dni')
+        assign_patient = Profile.find_one_by_dni(assign_dni) if assign_dni else None
+
         return render_template(
             "appointment/select_appointment.html",
             doctors=doctors,
             specialties=specialties,
-            message=message
+            message=message,
+            assign_patient=assign_patient,
+            assign_dni=assign_dni
         )
 
     @staticmethod

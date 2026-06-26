@@ -70,7 +70,7 @@ class ProfileController:
                 message = "No existe un paciente con ese DNI."
             else:
                 if patient.user_id:
-                    appointments = Appointment.find_all_by_patient(patient.user_id)
+                    appointments = Appointment.find_history_by_patient(patient.user_id)
 
         return render_template(
             "profile/patient.html",
@@ -95,6 +95,12 @@ class ProfileController:
             return redirect(url_for('profile.patient', dni=dni))
         appointment = Appointment.query.filter_by(id=appointment_id).first()
         if appointment:
+            # Un turno ya cancelado no puede modificarse: queda como registro
+            # histórico y su horario ya fue liberado.
+            if appointment.status == 'cancelled':
+                flash("El turno ya está cancelado y no puede modificarse.", 'error')
+                return redirect(url_for('profile.patient', dni=dni))
+
             current_label = 'Pendiente' if appointment.status == 'booked' else ('Asistió' if appointment.status == 'attended' else 'Cancelado')
             if current_label == new_status:
                 message = "El estado seleccionado es igual al actual; no se realizaron cambios."
